@@ -1,4 +1,4 @@
-## Chip S3 Imagery Docs
+## chipper-from-vrt
 
 ### Table of Contents
 
@@ -11,17 +11,15 @@
 
 ### About
 
-A GBDX task for generating AOI chips from imagery on S3. Imagery can be either a FLAME mosaic or a list of image strips on S3. AOIs are provided in a geojson file. Chips are saved to a user-defined S3 location along with a reference geojson 'ref.geojson', which contains all features that were chipped out.
+A GBDX task for generating AOI chips from imagery on S3. Imagery can be either a FLAME mosaic or a group of individual image strips on S3. AOIs are provided in a geojson file. Chips are saved to a user-defined S3 location along with a reference geojson 'ref.geojson', which contains all features that were chipped out.
 
- If there is spatial overlapping between input images, content will be fetched from the files listed at the end on the imagery_location input.
-
-
-### Executing the Task
-
-Here we run through a sample execution. In the first example we chip AOIs from a flame mosaic, followed by an example of chipping from multiple image strips.
+If there is spatial overlap between input images, content will be fetched from the files listed at the end on the imagery_location input.
 
 
-#### Chip From Strips
+### Executing the task
+
+
+#### Chip from strips
 
 <img src='images/chip-s3-strips.png' width=500>
 
@@ -84,7 +82,7 @@ Here we run through a sample execution. In the first example we chip AOIs from a
     strip_wf.execute()
     ```
 
-#### Chip From Mosaic
+#### Chip from mosaic
 
 <img src='images/chip-s3-mosaic.png' width=500>
 
@@ -137,7 +135,7 @@ Here we run through a sample execution. In the first example we chip AOIs from a
     ```
 
 
-### Inputs:
+### Inputs
 
 | **Parameter:**  | Description:                                                     |
 |-----------------|------------------------------------------------------------------|
