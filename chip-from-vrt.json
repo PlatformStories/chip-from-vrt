@@ -60,7 +60,7 @@
         {
             "type": "DOCKER",
             "properties": {
-                "image": "naldeborgh/chip-from-vrt",
+                "image": "platformstories/chip-from-vrt",
                 "domain": "default"
             },
             "command": "python /chip-from-vrt.py",
