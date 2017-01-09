@@ -13,7 +13,7 @@
             "required": true
         },
         {
-            "name": "imagery_location",
+            "name": "imagery",
             "type": "string",
             "description": "String: location on S3 of the imagery. Note that if the bucket is not public you must enter valid AWS keys and a token to access the imagery. If using a FLAME mosaic this should be the location of the project directory as follows: bucket_name/path/to/project_name/. This directory must contain the a subdirectory with the mosaic tiles and a wms/ subdirectory with a shapefile 'vsitindex_z12.shp'. Otherwise, this should be the exact S3 location of any image strips being used. Different strips should be separated by a comma as follows: 'bucket_name/path/to/image1.tif, bucket_name/path/to.image2.tif', ...",
             "required": true
