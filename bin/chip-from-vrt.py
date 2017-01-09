@@ -59,7 +59,7 @@ def mask_chip(feature):
     os.remove(fn)
 
 
-class ChipperFromVrt(GbdxTaskInterface):
+class ChipFromVrt(GbdxTaskInterface):
     '''
     Extract features in a geojson from imagery
     '''
@@ -286,5 +286,5 @@ class ChipperFromVrt(GbdxTaskInterface):
 
 if __name__ == '__main__':
 
-    with ChipperFromVrt() as task:
+    with ChipFromVrt() as task:
         task.invoke()
