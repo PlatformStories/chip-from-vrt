@@ -12,7 +12,7 @@ There are two ways to run chipper-from-vrt; chip from a group of individual stri
 
 <img src='images/chip-s3-strips.png' width=500>
 
-1. Within an iPython terminal create a GBDX interface:
+1. In a Python terminal create a GBDX interface:
 
     ```python
     from gbdxtools import Interface
@@ -75,7 +75,7 @@ There are two ways to run chipper-from-vrt; chip from a group of individual stri
 
 <img src='images/chip-s3-mosaic.png' width=500>
 
-1. Within an iPython terminal create a GBDX interface:
+1. In a Python terminal create a GBDX interface:
 
     ```python
     from gbdxtools import Interface
