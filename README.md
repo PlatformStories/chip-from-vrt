@@ -1,27 +1,14 @@
-## chipper-from-vrt
+# chipper-from-vrt
 
-### Table of Contents
-
-1. [About](#about)
-2. [Executing the task](#executing-the-task)
-    - [Chip from strips](#chip-from-strips)
-    - [Chip from mosaic](#chip-from-mosaic)
-3. [Inputs](#inputs)
-4. [Advanced](#advanced)
-
-### About
-
-A GBDX task for generating AOI chips from a group of images in an S3 location using [the GDAL virtual format](http://www.gdal.org/gdal_vrttut.html). The images can be individual strips or the tiles of a FLAME mosaic. 
-AOIs are provided in a geojson file. Chips are saved to a user defined S3 location along with a reference geojson 'ref.geojson', which contains all the AOIs that were chipped out.
-
-If there is spatial overlap between images, the chip is retrieved from the last image to be uploaded to the S3 location.  
+A GBDX task for generating AOI chips from a group of images in an S3 location using [the GDAL virtual format](http://www.gdal.org/gdal_vrttut.html). The images can be individual strips or the tiles of a FLAME mosaic.
+AOIs are provided in a geojson file. Chips are saved to a user defined S3 location along with a reference geojson ref.geojson which contains the AOIs that were chipped out. If there is spatial overlap between images, the chip is retrieved from the last image to be uploaded to the S3 location.  
 
 
-### Executing the task
+## Run
 
-There are two ways to execute chipper-from-vrt; chip from a group of individual strips or from a group of tiles that comprise a FLAME mosaic.
+There are two ways to run chipper-from-vrt; chip from a group of individual strips or from a group of tiles that comprise a FLAME mosaic.
 
-#### Chip from strips
+### Chip from strips
 
 <img src='images/chip-s3-strips.png' width=500>
 
@@ -84,7 +71,7 @@ There are two ways to execute chipper-from-vrt; chip from a group of individual 
     strip_wf.execute()
     ```
 
-#### Chip from mosaic
+### Chip from FLAME mosaic
 
 <img src='images/chip-s3-mosaic.png' width=500>
 
@@ -137,7 +124,7 @@ There are two ways to execute chipper-from-vrt; chip from a group of individual 
     ```
 
 
-### Inputs
+## Input ports
 
 | **Parameter:**  | Description:                                                     |
 |-----------------|------------------------------------------------------------------|
@@ -149,7 +136,7 @@ There are two ways to execute chipper-from-vrt; chip from a group of individual 
 |  aws_session_token | String: AWS session token for imagery bucket. Required for imagery in the gbd-customer-data bucket. It is recommended to use a 36-hour token (gbdxtools currently defaults to 10 hours). |  
 |  mask | String ('boolean'): Blackfill pixels outside the polygon. Otherwise entire bounding box will be included in the output chip. |  
 
-### Advanced
+## Advanced
 
 When chipping a large number of AOIs (>10000) from image strips it is recommended to use internal tiling to speed up the task. To accomplish this you may use the ```tile-strips``` gbdx task on each image as follows:
 
@@ -164,4 +151,42 @@ tiler_wf = gbdx.Task([tiler])
 tiler_wf.savedata(tiler.outputs.tiled_images, 'path/to/imagery/')
 
 tiler_wf.execute()
+```
+
+## Development
+
+### Build the Docker image
+
+You need to install [Docker](https://docs.docker.com/engine/installation/).
+
+Clone the repository:
+
+```bash
+git clone https://github.com/platformstories/chipper-from-vrt
+```
+
+Then:
+
+```bash
+cd chipper-from-vrt
+docker build -t yourusername/chipper-from-vrt .
+```
+
+Then push the image to Docker Hub:
+
+```bash
+docker push yourusername/chipper-from-vrt
+```
+
+The image name should be the same as the image name under containerDescriptors in chipper-from-vrt.json.
+
+
+### Register on GBDX
+
+In a Python terminal:
+
+```python
+import gbdxtools
+gbdx = gbdxtools.Interface()
+gbdx.task_registry.register(json_filename='chipper-from-vrt.json')
 ```
