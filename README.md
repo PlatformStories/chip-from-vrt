@@ -3,21 +3,23 @@
 ### Table of Contents
 
 1. [About](#about)
-2. [Executing the Task](#executing-the-task)
-    - [Chip from Strips](#chip-from-strips)
-    - [Chip from Mosaic](#chip-from-mosaic)
+2. [Executing the task](#executing-the-task)
+    - [Chip from strips](#chip-from-strips)
+    - [Chip from mosaic](#chip-from-mosaic)
 3. [Inputs](#inputs)
 4. [Advanced](#advanced)
 
 ### About
 
-A GBDX task for generating AOI chips from imagery on S3. Imagery can be either a FLAME mosaic or a group of individual image strips on S3. AOIs are provided in a geojson file. Chips are saved to a user-defined S3 location along with a reference geojson 'ref.geojson', which contains all features that were chipped out.
+A GBDX task for generating AOI chips from a group of images in an S3 location using [the GDAL virtual format](http://www.gdal.org/gdal_vrttut.html). The images can be individual strips or the tiles of a FLAME mosaic. 
+AOIs are provided in a geojson file. Chips are saved to a user defined S3 location along with a reference geojson 'ref.geojson', which contains all the AOIs that were chipped out.
 
-If there is spatial overlap between input images, content will be fetched from the files listed at the end on the imagery_location input.
+If there is spatial overlap between images, the chip is retrieved from the last image to be uploaded to the S3 location.  
 
 
 ### Executing the task
 
+There are two ways to execute chipper-from-vrt; chip from a group of individual strips or from a group of tiles that comprise a FLAME mosaic.
 
 #### Chip from strips
 
