@@ -1,6 +1,6 @@
 {
     "name": "chip-from-vrt",
-    "description": "Extract AOIs in a geojson file from imagery on S3. Images can be strips or a FLAME mosaic",
+    "description": "A GBDX task for generating AOI chips from a group of images on S3 using the GDAL virtual format. The images can be individual strips or the tiles of a FLAME mosaic.",
     "properties": {
         "isPublic": true,
         "timeout": 36000
@@ -15,37 +15,38 @@
         {
             "name": "images",
             "type": "string",
-            "description": "String: location on S3 of the imagery. Note that if the bucket is not public you must enter valid AWS keys and a token to access the imagery. If using a FLAME mosaic this should be the location of the project directory as follows: bucket_name/path/to/project_name/. This directory must contain the a subdirectory with the mosaic tiles and a wms/ subdirectory with a shapefile 'vsitindex_z12.shp'. Otherwise, this should be the exact S3 location of any image strips being used. Different strips should be separated by a comma as follows: 'bucket_name/path/to/image1.tif, bucket_name/path/to.image2.tif', ...",
+            "description": "S3 image locations. Note that if the bucket is private you must enter valid AWS keys and a token to access the imagery. If using a FLAME mosaic this should be the location of the project directory as follows: bucket_name/path/to/project_name/. This directory must contain the a subdirectory with the mosaic tiles and a wms/ subdirectory with a shapefile 'vsitindex_z12.shp'. Otherwise, this should be the exact S3 location of any image strips being used. Different strips should be separated by a comma as follows: 'bucket_name/path/to/image1.tif, bucket_name/path/to.image2.tif', ...",
             "required": true
         },
         {
             "name": "mosaic",
             "type": "string",
-            "description": "Bool: True if the images input is a FLAME mosaic, otherwise the task will expect the images inputs to be strips. Defaults to False.",
+
+            "description": "True if the images comprise a FLAME mosaic; else False. Defaults to False.",
             "required": false
         },
         {
             "name": "aws_access_key",
             "type": "string",
-            "description": "String: Amazon AWS access key. The account associated with this key should have read access to the bucket containing the mosaic",
+            "description": "AWS access key. The account associated with this key should have read access to the bucket containing the mosaic.",
             "required": false
         },
         {
             "name": "aws_secret_key",
             "type": "string",
-            "description": "String: Amazon AWS secret access key. The account associated with this key should have read access to the bucket containing the mosaic.",
+            "description": "AWS secret access key. The account associated with this key should have read access to the bucket containing the mosaic.",
             "required": false
         },
         {
             "name": "aws_session_token",
             "type": "string",
-            "description": "String: Amazon AWS session token. This is necessary if the images input uses IAM credentials such as is in the gbd_customer_data bucket.",
+            "description": "AWS session token. This is necessary if the images input uses IAM credentials such as is in the gbd_customer_data bucket.",
             "required": false
         },
         {
             "name": "mask",
             "type": "string",
-            "description": "Bool: mask the chip by blackfilling any pixels outside of the polygon. If False, the entire bounding box of each polygon is produced. Defaults to False",
+            "description": "If True, blackfill pixels outside the polygon. Otherwise entire bounding box will be included in the output chip. Defaults to False.",
             "required": false
         }
     ],
@@ -53,7 +54,7 @@
         {
             "name": "chips",
             "type": "directory",
-            "description": "AOIs from input geojson saved as tifs. Each chips is named after it's feature_id value. A reference geojson file with feature ids for each geometry will also be saved in this directory."
+            "description": "Contains chipped AOIs from input geojson in tif format. Each chip is named after its feature_id value. A reference geojson file with feature ids for each geometry is also saved in this directory."
         }
     ],
     "containerDescriptors": [
