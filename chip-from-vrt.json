@@ -13,7 +13,7 @@
             "required": true
         },
         {
-            "name": "imagery",
+            "name": "images",
             "type": "string",
             "description": "String: location on S3 of the imagery. Note that if the bucket is not public you must enter valid AWS keys and a token to access the imagery. If using a FLAME mosaic this should be the location of the project directory as follows: bucket_name/path/to/project_name/. This directory must contain the a subdirectory with the mosaic tiles and a wms/ subdirectory with a shapefile 'vsitindex_z12.shp'. Otherwise, this should be the exact S3 location of any image strips being used. Different strips should be separated by a comma as follows: 'bucket_name/path/to/image1.tif, bucket_name/path/to.image2.tif', ...",
             "required": true
@@ -21,7 +21,7 @@
         {
             "name": "mosaic",
             "type": "string",
-            "description": "Bool: True if the imagery is a FLAME mosaic, otherwise the task will expect the imagery_location inputs to be strips. Defaults to False.",
+            "description": "Bool: True if the images input is a FLAME mosaic, otherwise the task will expect the images inputs to be strips. Defaults to False.",
             "required": false
         },
         {
@@ -39,7 +39,7 @@
         {
             "name": "aws_session_token",
             "type": "string",
-            "description": "String: Amazon AWS session token. This is necessary if the imagery_location input uses IAM credentials such as is in the gbd_customer_data bucket.",
+            "description": "String: Amazon AWS session token. This is necessary if the images input uses IAM credentials such as is in the gbd_customer_data bucket.",
             "required": false
         },
         {

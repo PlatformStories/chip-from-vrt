@@ -75,7 +75,7 @@ class ChipFromVrt(GbdxTaskInterface):
         self.geojson_dir = self.get_input_data_port('geojson')
         self.geojsons = [f for f in os.listdir(self.geojson_dir) if f.endswith('.geojson')]
         self.geojson = os.path.join(self.geojson_dir, self.geojsons[0])
-        self.imagery = self.get_input_string_port('imagery')
+        self.imagery = self.get_input_string_port('images')
         self.mosaic = ast.literal_eval(self.get_input_string_port('mosaic', default='False'))
         self.min_side_dim = int(self.get_input_string_port('min_side_dim', default='0'))
         self.max_side_dim = ast.literal_eval(self.get_input_string_port('max_side_dim', default='None'))
