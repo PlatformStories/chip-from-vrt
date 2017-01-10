@@ -128,8 +128,8 @@ There are two ways to run chip-from-vrt; chip from a group of individual strips 
 
 GBDX input ports can only be of 'Directory' or 'String' type. Booleans, integers and floats are passed to the task as strings, e.g., 'True', '10', '0.001'.
 
-| Name  | Type | Description | Required
-|-----------------|------------------------------------------------------------------|
+| Name  | Type | Description | Required |
+|-----------------|-----------------|-----------------|-----------------|
 | geojson | Directory | Contains one geojson file containing AOIs to extract from the mosaic. If chips are to be used for training each feature must have a class_name property. Features will be saved as feature_id.tif in the output directory. If no feature_id property is present, ids will be generated and saved to the reference gejoson in the output directory. | True |
 |  imagery | String | S3 image locations. Note that if the bucket is private you must enter valid AWS keys and a token to access the imagery. If using a FLAME mosaic this should be the location of the project directory as follows: bucket_name/path/to/project_name/. This directory must contain the a subdirectory with the mosaic tiles and a wms/ subdirectory with a shapefile 'vsitindex_z12.shp'. Otherwise, this should be the exact S3 location of any image strips being used. Different strips should be separated by a comma as follows: 'bucket_name/path/to/image1.tif, bucket_name/path/to.image2.tif', ...| True |
 |  mosaic | String | True if the images comprise a FLAME mosaic; else False. Defaults to False.| False |  
