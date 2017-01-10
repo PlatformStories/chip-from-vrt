@@ -1,6 +1,6 @@
 # chip-from-vrt
 
-A GBDX task for generating AOI chips from a group of images in an S3 location using [the GDAL virtual format](http://www.gdal.org/gdal_vrttut.html) (vrt). The images can be individual strips or the tiles of a FLAME mosaic. By creating a vrt that points to the remote locations of the imagery, the task can extract pixel data from any number of images without having to mount the entire image to the worker node, thus reducing overhead and bypassing disc space limitations.
+A GBDX task for generating AOI chips from a group of images on S3 using [the GDAL virtual format](http://www.gdal.org/gdal_vrttut.html) (vrt). The images can be individual strips or the tiles of a FLAME mosaic. By creating a vrt that points to the remote locations of the imagery, the task can extract pixel data from any number of images without having to mount the entire image to the worker node, thus reducing overhead and bypassing disc space limitations.
 AOIs are provided in a geojson file. Chips are saved to a user defined S3 location along with a reference geojson (ref.geojson), which contains the AOIs that were chipped out. Note that ref.geojson will not contain AOIs from the input geojson that failed to be extracted from the imagery. If there is spatial overlap between images, the chip is retrieved from the last image to be listed on the imagery input.
 
 
@@ -20,7 +20,7 @@ There are two ways to run chip-from-vrt; chip from a group of individual strips 
     import uuid
 
     gbdx = Interface()
-    input_location = 's3://gbd-customer-data/58600248-2927-4523-b44b-5fec3d278c09/platform-stories/building-detection-large-scale/'
+    input_location = 's3://gbd-customer-data/58600248-2927-4523-b44b-5fec3d278c09/platform-stories/chip-from-vrt/'
 
     ```
 
@@ -146,7 +146,7 @@ There are two ways to run chip-from-vrt; chip from a group of individual strips 
 
 ### Internal Tiling for Faster Chipping
 
-When chipping a large number of AOIs (>10000) from image strips it is recommended to use internal tiling to speed up the task. To accomplish this you may use the ```tile-strips``` gbdx task on each image as follows:
+When chipping a large number of AOIs (>10000) from image strips it is recommended to use internal tiling to speed up the task. To accomplish this you may use the [tile-strips](https://github.com/PlatformStories/tile-strips) gbdx task on each image as follows:
 
 ```python
 from gbdxtools import Interface()
@@ -163,7 +163,7 @@ tiler_wf.execute()
 
 ### Virtual Datasets and Image Overlap
 
-The task uses [gdalbuildvrt](http://www.gdal.org/gdalbuildvrt.html) to create a virtual dataset that combines all input imagery and points to the various locations of each strip on S3. The task uses this vrt as a reference for where to find the pixel data of each AOI. If there is spatial overlap between images, data is extracted from the latest image listed. The order that the images are input to the task is maintained when calling gdalbuildvrt. 
+The task uses [gdalbuildvrt](http://www.gdal.org/gdalbuildvrt.html) to create a virtual dataset that combines all input imagery and points to the various locations of each strip on S3. The task uses this vrt as a reference for where to find the pixel data of each AOI. If there is spatial overlap between images, data is extracted from the latest image listed. The order that the images are input to the task is maintained when calling gdalbuildvrt.
 
 
 ## Development
