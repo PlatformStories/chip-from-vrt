@@ -5,7 +5,7 @@
 
 # mosaic data strux will be consistent, as follows:
 # # mosaic saved as bucket_name/mosaic_location
-# # appropriate vrt shapefile located at .../wms/vsitindex_z12.shp
+# # appropriate vrt shapefile located at .../wms/vsitindex_z12.shp (under other name sspecified in shapefile_name)
 # geojson has class_name if chips are for training
 
 import logging
@@ -83,6 +83,7 @@ class ChipFromVrt(GbdxTaskInterface):
         self.a_key = self.get_input_string_port('aws_access_key', default=None)
         self.s_key = self.get_input_string_port('aws_secret_key', default=None)
         self.token = self.get_input_string_port('aws_session_token', default=None)
+        self.shapefile = self.get_input_string_port('shapefile_name', default = 'vsitindex_z12.shp')
 
         # Assert exactly one geojson file passed
         if len(self.geojsons) != 1:
@@ -126,7 +127,7 @@ class ChipFromVrt(GbdxTaskInterface):
 
         # Create vrt from mosaic or input imagery
         if self.mosaic:
-            shp_dir = os.path.join('/vsis3', self.imagery, 'wms/vsitindex_z12.shp')
+            shp_dir = os.path.join('/vsis3', self.imagery, 'wms', self.shapefile)
             cmd = 'env GDAL_DISABLE_READDIR_ON_OPEN=YES VSI_CACHE=TRUE gdalbuildvrt mosaic.vrt ' + shp_dir
             subprocess.call(cmd, shell=True)
 
@@ -145,7 +146,7 @@ class ChipFromVrt(GbdxTaskInterface):
 
         else:
             logging.debug('VRT not created, check S3 vars and VRT command')
-            raise Exception('VRT could not be created. Make sure AWS credentials are accurate and vsitindex_z12.shp is in the project/wms/ location if using a mosaic.')
+            raise Exception('VRT could not be created. Make sure AWS credentials are accurate and shapefile is in the project/wms/ location if using a mosaic.')
 
 
     def generate_feature_ids(self, feature_collection):

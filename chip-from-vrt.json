@@ -15,7 +15,7 @@
         {
             "name": "images",
             "type": "string",
-            "description": "S3 image locations. Note that if the bucket is private you must enter valid AWS keys and a token to access the imagery. If using a FLAME mosaic this should be the location of the project directory as follows: bucket_name/path/to/project_name/. This directory must contain the a subdirectory with the mosaic tiles and a wms/ subdirectory with a shapefile 'vsitindex_z12.shp'. Otherwise, this should be the exact S3 location of any image strips being used. Different strips should be separated by a comma as follows: 'bucket_name/path/to/image1.tif, bucket_name/path/to.image2.tif', ...",
+            "description": "S3 image locations. Note that if the bucket is private you must enter valid AWS keys and a token to access the imagery. If using a FLAME mosaic this should be the location of the project directory as follows: bucket_name/path/to/project_name/. This directory must contain the a subdirectory with the mosaic tiles and a wms/ subdirectory with a shapefile specified in the shapefile_name input port. Otherwise, this should be the exact S3 location of any image strips being used. Different strips should be separated by a comma as follows: 'bucket_name/path/to/image1.tif, bucket_name/path/to.image2.tif', ...",
             "required": true
         },
         {
@@ -25,6 +25,12 @@
             "description": "True if the images comprise a FLAME mosaic; else False. Defaults to False.",
             "required": false
         },
+        {
+            "name": "shapefile_name",
+            "type": "string",
+            "description": "Name of the shapefile pointing to image raster location within the mosaic directory. Only relevant if using a flame mosaic. This file must be in the wms/ directory under the project folder. Defaults to vsitindex_z12.shp.",
+            "required": false
+        }
         {
             "name": "aws_access_key",
             "type": "string",
