@@ -1,6 +1,6 @@
 {
     "name": "chip-from-vrt",
-    "Version": "0.1.0",
+    "version": "0.1.0",
     "description": "A GBDX task for generating AOI chips from a group of images on S3 using the GDAL virtual format. The images can be individual strips or the tiles of a FLAME mosaic.",
     "properties": {
         "isPublic": true,
@@ -27,11 +27,11 @@
             "required": false
         },
         {
-            "name": "shapefile_name",
+            "name": "shapefile_location",
             "type": "string",
-            "description": "Name of the shapefile pointing to image raster location within the mosaic directory. Only relevant if using a flame mosaic. This file must be in the wms/ directory under the project folder. Defaults to vsitindex_z12.shp.",
+            "description": "Location of the shapefile pointing to image raster location within the mosaic directory. Only relevant if using a flame mosaic. This file must be in the project directory. Defaults to wms/vsitindex_z12.shp.",
             "required": false
-        }
+        },
         {
             "name": "aws_access_key",
             "type": "string",

@@ -83,7 +83,7 @@ class ChipFromVrt(GbdxTaskInterface):
         self.a_key = self.get_input_string_port('aws_access_key', default=None)
         self.s_key = self.get_input_string_port('aws_secret_key', default=None)
         self.token = self.get_input_string_port('aws_session_token', default=None)
-        self.shapefile = self.get_input_string_port('shapefile_name', default = 'vsitindex_z12.shp')
+        self.shapefile = self.get_input_string_port('shapefile_location', default = 'wms/vsitindex_z12.shp')
 
         # Assert exactly one geojson file passed
         if len(self.geojsons) != 1:
@@ -127,7 +127,7 @@ class ChipFromVrt(GbdxTaskInterface):
 
         # Create vrt from mosaic or input imagery
         if self.mosaic:
-            shp_dir = os.path.join('/vsis3', self.imagery, 'wms', self.shapefile)
+            shp_dir = os.path.join('/vsis3', self.imagery, self.shapefile)
             cmd = 'env GDAL_DISABLE_READDIR_ON_OPEN=YES VSI_CACHE=TRUE gdalbuildvrt mosaic.vrt ' + shp_dir
             subprocess.call(cmd, shell=True)
 
