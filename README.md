@@ -139,6 +139,7 @@ GBDX input ports can only be of 'Directory' or 'String' type. Booleans, integers
 |  aws_secret_key | String | AWS secret access key. The account associated with this key should have read access to the bucket containing the mosaic. | False |
 |  aws_session_token | String | AWS session token. This is necessary if the images input use IAM credentials such as is in the gbd_customer_data bucket. | False |  
 |  mask | String | If True, blackfill pixels outside the polygon. Otherwise entire bounding box will be included in the output chip. Defaults to False.| False |  
+|  bit_depth | String | Bit depth to set the output chips to if larger than 8. Defaults to 8.| False |  
 
 ## Output ports
 

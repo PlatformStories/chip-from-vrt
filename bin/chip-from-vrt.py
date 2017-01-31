@@ -194,7 +194,7 @@ class ChipFromVrt(GbdxTaskInterface):
                 print cmd
 
             else:
-                cmd = 'gdal_translate -eco -q -projwin -co NBITS={0} {1} {2} {3} {4} {5} {6}'.format(str(self.bit_depth), str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
+                cmd = 'gdal_translate -eco -q -co NBITS={0} -projwin {1} {2} {3} {4} {5} {6}'.format(str(self.bit_depth), str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
 
             gdal_cmds.append(cmd)
             logging.info(cmd)
