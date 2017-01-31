@@ -83,6 +83,7 @@ class ChipFromVrt(GbdxTaskInterface):
         self.a_key = self.get_input_string_port('aws_access_key', default=None)
         self.s_key = self.get_input_string_port('aws_secret_key', default=None)
         self.token = self.get_input_string_port('aws_session_token', default=None)
+        self.bit_depth = ast.literal_eval(self.get_input_string_port('bit_depth', default='None'))
         self.shapefile = self.get_input_string_port('shapefile_location', default = 'wms/vsitindex_z12.shp')
 
         # Assert exactly one geojson file passed
@@ -187,7 +188,14 @@ class ChipFromVrt(GbdxTaskInterface):
 
             # format gdal_translate command
             out_loc = os.path.join(self.out_dir, str(f_id) + '.tif')
-            cmd = 'gdal_translate -eco -q -projwin {0} {1} {2} {3} {4} {5}'.format(str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
+
+            if not self.bit_depth:
+                cmd = 'gdal_translate -eco -q -projwin {0} {1} {2} {3} {4} {5}'.format(str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
+                print cmd
+
+            else:
+                cmd = 'gdal_translate -eco -q -projwin -co NBITS={0} {1} {2} {3} {4} {5} {6}'.format(str(self.bit_depth), str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
+
             gdal_cmds.append(cmd)
             logging.info(cmd)
 
