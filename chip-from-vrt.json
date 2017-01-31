@@ -55,6 +55,12 @@
             "type": "string",
             "description": "If True, blackfill pixels outside the polygon. Otherwise entire bounding box will be included in the output chip. Defaults to False.",
             "required": false
+        },
+        {
+            "name": "bit_depth",
+            "type": "string",
+            "description": "Bit depth to set the output chips to if larger than 8. Defaults to 8.",
+            "required": false
         }
     ],
     "outputPortDescriptors": [
