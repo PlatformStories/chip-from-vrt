@@ -1,6 +1,6 @@
 {
     "name": "chip-from-vrt",
-    "version": "0.1.4",
+    "version": "0.2.0",
     "description": "A GBDX task for generating AOI chips from a group of images on S3 using the GDAL virtual format. The images can be individual strips or the tiles of a FLAME mosaic.",
     "properties": {
         "isPublic": true,
@@ -60,6 +60,12 @@
             "name": "bit_depth",
             "type": "string",
             "description": "Bit depth to set the output chips to if larger than 8. Defaults to 8.",
+            "required": false
+        },
+        {
+            "name": "bands",
+            "type": "string",
+            "description": "List of bands to include in the chips, each separated by a comma. Note that indexing starts at 1. For example, to use the first three bands use input '1,2,3'. Defaults to all bands.",
             "required": false
         }
     ],

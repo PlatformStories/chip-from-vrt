@@ -85,6 +85,7 @@ class ChipFromVrt(GbdxTaskInterface):
         self.token = self.get_input_string_port('aws_session_token', default=None)
         self.bit_depth = ast.literal_eval(self.get_input_string_port('bit_depth', default='None'))
         self.shapefile = self.get_input_string_port('shapefile_location', default = 'wms/vsitindex_z12.shp')
+        self.bands = self.get_input_string_port('bands', default=None)
 
         # Assert exactly one geojson file passed
         if len(self.geojsons) != 1:
@@ -104,6 +105,10 @@ class ChipFromVrt(GbdxTaskInterface):
         # Create output directory
         self.out_dir = self.get_output_data_port('chips')
         os.makedirs(self.out_dir)
+
+        # Format bands
+        if self.bands:
+            self.bands = [int(band.strip()) for band in self.bands.split(',')]
 
         # Format imagery input (list for non-mosaic, string for mosaic)
         # TODO make this a multiplex input port if possible
@@ -189,12 +194,17 @@ class ChipFromVrt(GbdxTaskInterface):
             # format gdal_translate command
             out_loc = os.path.join(self.out_dir, str(f_id) + '.tif')
 
-            if not self.bit_depth:
-                cmd = 'gdal_translate -eco -q -projwin {0} {1} {2} {3} {4} {5}'.format(str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
-                print cmd
+            pref, projwin = 'gdal_translate -eco -q', ' -projwin {0} {1} {2} {3} {4} {5}'.format(str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
 
-            else:
-                cmd = 'gdal_translate -eco -q -co NBITS={0} -projwin {1} {2} {3} {4} {5} {6}'.format(str(self.bit_depth), str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
+            if self.bit_depth:
+                pref += ' -co NBITS=' + str(self.bit_depth)
+
+            if self.bands:
+                for band in self.bands:
+                    pref += ' -b ' + str(band)
+
+            cmd = pref + projwin
+            print cmd
 
             gdal_cmds.append(cmd)
             logging.info(cmd)
@@ -259,6 +269,7 @@ class ChipFromVrt(GbdxTaskInterface):
 
         ##### Create VRT as a pointer to imagery on S3
         vrt_file = self.create_vrt()
+        # vrt_file = 'mosaic.vrt'
 
         ##### Generate feature ids if not provided
         if 'feature_id' not in  feature_collection[0]['properties'].keys():
