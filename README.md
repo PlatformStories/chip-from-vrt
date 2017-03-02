@@ -7,11 +7,68 @@ AOIs are provided in a geojson file. Chips are saved to a user-defined S3 locati
 
 ## Run
 
-There are two ways to run chip-from-vrt; chip from a group of individual strips or from a group of tiles that comprise a mosaic.
+There are two ways to run chip-from-vrt; chip from a group of tiles that comprise a mosaic, or from a group of individual image strips.
+
+### Chip from FLAME mosaic
+
+<img src='images/chip-from-mosaic.png' width=750>
+
+1. In a Python terminal create a GBDX interface:
+
+    ```python
+    from gbdxtools import Interface
+    from os.path import join
+    import uuid
+
+    gbdx = Interface()
+
+    # Specify location of input files and aws creds
+    input_location = 's3://gbd-customer-data/58600248-2927-4523-b44b-5fec3d278c09/platform-stories/chip-from-vrt/'
+    info = gbdx.s3.info
+    access_key = info['S3_access_key']
+    secret_key = info['S3_secret_key']
+    session_token = info['S3_secret_key']
+    ```
+
+2. Create a task instance and set the required [inputs](#inputs):
+
+    ```python
+    chip_mosaic = gbdx.Task('chip-from-vrt')
+    chip_mosaic.inputs.geojson = join(input_location, 'mosaic-geojson/')
+    chip_mosaic.inputs.images = join(input_location, 'mosaic/')
+    chip_mosaic.inputs.mosaic = 'True'
+    chip_mosaic.inputs.aws_access_key = access_key
+    chip_mosaic.inputs.aws_secret_key = secret_key
+    chip_mosaic.inputs.aws_session_token = session_token
+    ```
+
+3. Set the domain to raid if chipping more than 10000 AOIs to speed up execution:
+
+    ```python
+    chip_mosaic.domain = 'raid'
+    ```
+
+4. Create a workflow from the task and specify where to save the output chips:
+
+    ```python
+    # Specify output location with random string
+    random_str = str(uuid.uuid4())
+    output_location = join('platform-stories/trial-runs', random_str)
+
+    # Create the workflow and save the output to output_location
+    chip_mosaic_wf = gbdx.Workflow([chip_mosaic])
+    chip_mosaic_wf.savedata(chip_mosaic.outputs.chips, join(output_location, 'mosaic-chips'))
+    ```
+
+5. Execute the workflow:
+
+    ```python
+    chip_mosaic_wf.execute()
+    ```
 
 ### Chip from strips
 
-<img src='images/chip-from-strips.png' width=500>
+<img src='images/chip-from-strips.png' width=750>
 
 1. In a Python terminal create a GBDX interface:
 
@@ -70,58 +127,6 @@ There are two ways to run chip-from-vrt; chip from a group of individual strips 
 
     ```python
     chip_strips_wf.execute()
-    ```
-
-### Chip from FLAME mosaic
-
-<img src='images/chip-from-mosaic.png' width=500>
-
-1. In a Python terminal create a GBDX interface:
-
-    ```python
-    from gbdxtools import Interface
-    from os.path import join
-    import uuid
-
-    gbdx = Interface()
-
-    # Specify location of input files
-    input_location = 's3://gbd-customer-data/58600248-2927-4523-b44b-5fec3d278c09/platform-stories/chip-from-vrt/'
-    ```
-
-2. Create a task instance and set the required [inputs](#inputs):
-
-    ```python
-    chip_mosaic = gbdx.Task('chip-from-vrt')
-    chip_mosaic.inputs.geojson = join(input_location, 'mosaic-geojson/')
-    chip_mosaic.inputs.images = 'flame-projects/335-dikwa-nigeria'
-    chip_mosaic.inputs.mosaic = 'True'
-    chip_mosaic.inputs.aws_access_key = 'access_key'     # Required for non-public mosaic (need read access)
-    chip_mosaic.inputs.aws_secret_key = 'secret_key'     # Required for non-public mosaic (need read access)
-    ```
-
-3. Set the domain to raid if chipping more than 10000 AOIs to speed up execution:
-
-    ```python
-    chip_mosaic.domain = 'raid'
-    ```
-
-4. Create a workflow from the task and specify where to save the output chips:
-
-    ```python
-    # Specify output location with random string
-    random_str = str(uuid.uuid4())
-    output_location = join('platform-stories/trial-runs', random_str)
-
-    # Create the workflow and save the output to output_location
-    chip_mosaic_wf = gbdx.Workflow([chip_mosaic])
-    chip_mosaic_wf.savedata(chip_mosaic.outputs.chips, join(output_location, 'mosaic-chips'))
-    ```
-
-5. Execute the workflow:
-
-    ```python
-    chip_mosaic_wf.execute()
     ```
 
 
