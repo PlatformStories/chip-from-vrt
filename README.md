@@ -1,17 +1,17 @@
 # chip-from-vrt
 
-A GBDX task for generating AOI chips from a group of images on S3 using [the GDAL virtual format](http://www.gdal.org/gdal_vrttut.html) (vrt). The images can be individual strips or the tiles of a FLAME mosaic. By creating a vrt that points to the images, the task can extract pixels from an unlimited number of images without having to mount these onto the worker node, thus reducing overhead and bypassing disc space limitations.
+A GBDX task for generating AOI chips from a mosaic or an arbitrary number of image strips on S3 using [the GDAL virtual format](http://www.gdal.org/gdal_vrttut.html) (vrt). By creating a vrt that points to the imagery location on S3, the task can extract pixels from an unlimited number of images without having to mount these onto the worker node, thus reducing overhead and bypassing disc space limitations.
 
-AOIs are provided in a geojson file. Chips are saved to a user-defined S3 location along with a reference geojson (ref.geojson) which contains the AOIs that were chipped out; AOIs which can not be extracted are not included. If there is spatial overlap between images, the AOI is extracted from the last image to be listed as input.
+AOIs are provided in a geojson file. Chips are saved to a user-defined S3 location along with a reference geojson (ref.geojson) which contains the geometries of each chip, along with the feature id and class name (if provided in the input geojson); AOIs that can not be extracted are not included in the chips or ref.geojson. If there is spatial overlap between images, the AOI is extracted from the last image to be listed as input.
 
 
 ## Run
 
-There are two ways to run chip-from-vrt; chip from a group of individual strips or from a group of tiles that comprise a FLAME mosaic.
+There are two ways to run chip-from-vrt; chip from a group of individual strips or from a group of tiles that comprise a mosaic.
 
 ### Chip from strips
 
-<img src='images/chip-s3-strips.png' width=500>
+<img src='images/chip-from-strips.png' width=500>
 
 1. In a Python terminal create a GBDX interface:
 
@@ -74,7 +74,7 @@ There are two ways to run chip-from-vrt; chip from a group of individual strips 
 
 ### Chip from FLAME mosaic
 
-<img src='images/chip-s3-mosaic.png' width=500>
+<img src='images/chip-from-mosaic.png' width=500>
 
 1. In a Python terminal create a GBDX interface:
 
