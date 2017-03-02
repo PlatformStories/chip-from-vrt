@@ -296,12 +296,12 @@ class ChipFromVrt(GbdxTaskInterface):
             p.close()
             p.join()
 
-        ##### Create output geojson for feature_id reference
-        self.get_ref_geojson(data)
-
         ##### Remove msk files
         for fl in glob('*.msk'):
             os.remove(fl)
+
+        ##### Create output geojson for feature_id reference
+        self.get_ref_geojson(data)
 
 
 if __name__ == '__main__':
