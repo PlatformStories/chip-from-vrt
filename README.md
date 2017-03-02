@@ -85,10 +85,10 @@ There are two ways to run chip-from-vrt; chip from a group of tiles that compris
 2. For images on the gbd-customer-data bucket you will need to set S3 credentials (including a session token). It is recommended to request credentials that last for 36 hours to ensure they last for the duration of the task. Do so by sending a post to ```https://geobigdata.io/s3creds/v1/prefix?duration=129600``` and using these values as the aws credentials below.
 
     ```python
-    inf = gbdx.s3.info          # Skip this if using 36 hr credentials
-    access_key = inf['S3_access_key']
-    secret_key = inf['S3_secret_key']
-    session_token = inf['S3_session_token']
+    info = gbdx.s3.info          # Skip this if using 36 hr credentials
+    access_key = info['S3_access_key']
+    secret_key = info['S3_secret_key']
+    session_token = info['S3_session_token']
     ```
 
 3. Create a task instance and set the required [inputs](#inputs):
