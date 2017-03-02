@@ -27,7 +27,7 @@ There are two ways to run chip-from-vrt; chip from a group of tiles that compris
     info = gbdx.s3.info
     access_key = info['S3_access_key']
     secret_key = info['S3_secret_key']
-    session_token = info['S3_secret_key']
+    session_token = info['S3_session_token']
     ```
 
 2. Create a task instance and set the required [inputs](#inputs):
