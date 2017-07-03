@@ -1,8 +1,8 @@
 # chip-from-vrt
 
-A GBDX task for generating AOI chips from a mosaic or an arbitrary number of image strips on S3 using [the GDAL virtual format](http://www.gdal.org/gdal_vrttut.html) (vrt). By creating a vrt that points to the imagery location on S3, the task can extract pixels from an unlimited number of images without having to mount these onto the worker node, thus reducing overhead and bypassing disc space limitations.
+A GBDX task for generating image chips from a mosaic or an arbitrary number of image strips on S3 using [the GDAL virtual format](http://www.gdal.org/gdal_vrttut.html) (vrt). By creating a vrt that points to the imagery location on S3, the task can extract pixels from an unlimited number of images without having to mount these onto the worker node, thus reducing overhead and bypassing disc space limitations.
 
-AOIs are provided in a geojson file. Chips are saved to a user-defined S3 location along with a reference geojson (ref.geojson) which contains the geometries of each chip, along with the feature id and class name (if provided in the input geojson); AOIs that can not be extracted are not included in the chips or ref.geojson. If there is spatial overlap between images, the AOI is extracted from the last image to be listed as input.
+The chip geometries are provided in a geojson file. Chips are saved to a user-defined S3 location along with a reference geojson (ref.geojson) which contains the geometry of each chip, along with the feature id and class name (if provided in the input geojson); chips that can not be extracted are not included in the chips or ref.geojson. If there is spatial overlap between images, the chip is extracted from the last image to be listed as input.
 
 
 ## Run
@@ -42,7 +42,7 @@ There are two ways to run chip-from-vrt; chip from a group of tiles that compris
     chip_mosaic.inputs.aws_session_token = session_token
     ```
 
-3. Set the domain to raid if chipping more than 10000 AOIs to speed up execution:
+3. Set the domain to raid if generating more than 10000 chips to speed up execution:
 
     ```python
     chip_mosaic.domain = 'raid'
@@ -106,7 +106,7 @@ There are two ways to run chip-from-vrt; chip from a group of tiles that compris
     chip_strips.inputs.aws_session_token = session_token
     ```
 
-4. Set the domain to raid if chipping more than 10000 AOIs to speed up execution:
+4. Set the domain to raid if generating more than 10000 chips to speed up execution:
 
     ```python
     chip_strips.domain = 'raid'
@@ -157,7 +157,7 @@ GBDX input ports can only be of 'Directory' or 'String' type. Booleans, integers
 
 ### Internal Tiling for Faster Chipping
 
-When chipping a large number of AOIs (>10000) from image strips it is recommended to use internal tiling to speed up the task. To accomplish this you may use the [tile-strips](https://github.com/PlatformStories/tile-strips) gbdx task on each image as follows:
+When generating a large number of chips(>10000) from image strips, it is recommended to use internal tiling to speed up the task. To accomplish this you may use the [tile-strips](https://github.com/PlatformStories/tile-strips) gbdx task on each image as follows:
 
 ```python
 from gbdxtools import Interface()
