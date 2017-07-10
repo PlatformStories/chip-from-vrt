@@ -83,6 +83,7 @@ class ChipFromVrt(GbdxTaskInterface):
         self.a_key = self.get_input_string_port('aws_access_key', default=None)
         self.s_key = self.get_input_string_port('aws_secret_key', default=None)
         self.token = self.get_input_string_port('aws_session_token', default=None)
+        self.tar = ast.literal_eval(self.get_input_string_port('tar', default='False'))
         self.bit_depth = ast.literal_eval(self.get_input_string_port('bit_depth', default='None'))
         self.shapefile = self.get_input_string_port('shapefile_location', default = 'wms/vsitindex_z12.shp')
         self.bands = self.get_input_string_port('bands', default=None)
@@ -194,7 +195,8 @@ class ChipFromVrt(GbdxTaskInterface):
             # format gdal_translate command
             out_loc = os.path.join(self.out_dir, str(f_id) + '.tif')
 
-            pref, projwin = 'env GDAL_DISABLE_READDIR_ON_OPEN=YES VSI_CACHE=TRUE CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif .vrt" gdal_translate -eco -q', ' -projwin {0} {1} {2} {3} {4} {5} --config GDAL_TIFF_INTERNAL_MASK YES'.format(str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
+            pref = 'env GDAL_DISABLE_READDIR_ON_OPEN=YES VSI_CACHE=TRUE CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif .vrt" gdal_translate -eco -q'
+            projwin = ' -projwin {0} {1} {2} {3} {4} {5} --config GDAL_TIFF_INTERNAL_MASK YES'.format(str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
 
             if self.bit_depth:
                 pref += ' -co NBITS=' + str(self.bit_depth)
@@ -302,6 +304,17 @@ class ChipFromVrt(GbdxTaskInterface):
 
         ##### Create output geojson for feature_id reference
         self.get_ref_geojson(data)
+
+        ##### Create tar file of chips
+        if self.tar:
+            os.chdir('..')
+            cmd = 'tar -cvf chips.tar chips/'
+            subprocess.call(cmd, shell=True)
+            shutil.move('chips.tar', 'chips/chips.tar')
+            os.chdir('chips/')
+
+            for fl in glob('*.tif') + glob('*.geojson'):
+                os.remove(fl)
 
 
 if __name__ == '__main__':

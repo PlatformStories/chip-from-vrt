@@ -67,6 +67,12 @@
             "type": "string",
             "description": "List of bands to include in the chips, each separated by a comma. Note that indexing starts at 1. For example, to use the first three bands use input '1,2,3'. Defaults to all bands.",
             "required": false
+        },
+        {
+          "name": "tar",
+          "type": "string",
+          "description": "If True, outputs chips directory as a tar file. Defaults to False",
+          "required": false
         }
     ],
     "outputPortDescriptors": [
