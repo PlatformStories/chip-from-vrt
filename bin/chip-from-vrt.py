@@ -11,7 +11,7 @@
 import logging
 import geojson, json
 import subprocess
-import os, ast, re
+import os, ast, re, shutil
 
 from glob import glob
 from functools import partial
