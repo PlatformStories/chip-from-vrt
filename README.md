@@ -23,7 +23,7 @@ There are two ways to run chip-from-vrt; chip from a group of tiles that compris
     gbdx = Interface()
 
     # Specify location of input files and aws creds
-    input_location = 's3://gbd-customer-data/58600248-2927-4523-b44b-5fec3d278c09/platform-stories/chip-from-vrt/'
+    input_location = 's3://gbd-customer-data/32cbab7a-4307-40c8-bb31-e2de32f940c2/platform-stories/chip-from-vrt/'
     info = gbdx.s3.info
     access_key = info['S3_access_key']
     secret_key = info['S3_secret_key']
@@ -37,6 +37,7 @@ There are two ways to run chip-from-vrt; chip from a group of tiles that compris
     chip_mosaic.inputs.geojson = join(input_location, 'mosaic-geojson/')
     chip_mosaic.inputs.images = join(input_location, 'mosaic/')
     chip_mosaic.inputs.mosaic = 'True'
+    chip_mosaic.inputs.tar = 'True'     # Output chip dir as a tar file
     chip_mosaic.inputs.aws_access_key = access_key
     chip_mosaic.inputs.aws_secret_key = secret_key
     chip_mosaic.inputs.aws_session_token = session_token
@@ -78,7 +79,7 @@ There are two ways to run chip-from-vrt; chip from a group of tiles that compris
     import uuid
 
     gbdx = Interface()
-    input_location = 's3://gbd-customer-data/58600248-2927-4523-b44b-5fec3d278c09/platform-stories/chip-from-vrt/'
+    input_location = 's3://gbd-customer-data/32cbab7a-4307-40c8-bb31-e2de32f940c2/platform-stories/chip-from-vrt/'
 
     ```
 
@@ -101,6 +102,7 @@ There are two ways to run chip-from-vrt; chip from a group of tiles that compris
     chip_strips = gbdx.Task('chip-from-vrt')
     chip_strips.inputs.geojson = join(input_location, 'strip-geojson')
     chip_strips.inputs.images = ', '.join([join(image_input, '1040010014BCA700.tif'), join(image_input, '1040010014800C00.tif')])
+    chip_strips.inputs.tar = 'True'     # Output chip dir as a tar file
     chip_strips.inputs.aws_access_key = access_key
     chip_strips.inputs.aws_secret_key = secret_key
     chip_strips.inputs.aws_session_token = session_token
