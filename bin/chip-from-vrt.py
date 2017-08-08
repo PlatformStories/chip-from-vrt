@@ -84,6 +84,7 @@ class ChipFromVrt(GbdxTaskInterface):
         self.s_key = self.get_input_string_port('aws_secret_key', default=None)
         self.token = self.get_input_string_port('aws_session_token', default=None)
         self.tar = ast.literal_eval(self.get_input_string_port('tar', default='False'))
+        self.jpg = ast.literal_eval(self.get_input_string_port('jpg', default='False'))
         self.bit_depth = ast.literal_eval(self.get_input_string_port('bit_depth', default='None'))
         self.shapefile = self.get_input_string_port('shapefile_location', default = 'wms/vsitindex_z12.shp')
         self.bands = self.get_input_string_port('bands', default=None)
@@ -195,7 +196,7 @@ class ChipFromVrt(GbdxTaskInterface):
             # format gdal_translate command
             out_loc = os.path.join(self.out_dir, str(f_id) + '.tif')
 
-            pref = 'env GDAL_DISABLE_READDIR_ON_OPEN=YES VSI_CACHE=TRUE CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif .vrt" gdal_translate -eco -q'
+            pref = 'env GDAL_DISABLE_READDIR_ON_OPEN=YES VSI_CACHE=TRUE CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif .vrt" gdal_translate -eco -q -co TILED=YES'
             projwin = ' -projwin {0} {1} {2} {3} {4} {5} --config GDAL_TIFF_INTERNAL_MASK YES'.format(str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
 
             if self.bit_depth:
@@ -204,6 +205,9 @@ class ChipFromVrt(GbdxTaskInterface):
             if self.bands:
                 for band in self.bands:
                     pref += ' -b ' + str(band)
+
+            if self.jpg:
+                pref += ' -co COMPRESS=JPEG -co PHOTOMETRIC=YCBCR'
 
             cmd = pref + projwin
             print cmd

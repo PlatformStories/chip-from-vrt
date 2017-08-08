@@ -73,6 +73,12 @@
           "type": "string",
           "description": "If True, outputs chips directory as a tar file. Defaults to False.",
           "required": false
+        },
+        {
+          "name": "jpg",
+          "type": "string",
+          "description": "If True, will JPEG compress output chips. Defaults to False.",
+          "required": false
         }
     ],
     "outputPortDescriptors": [
