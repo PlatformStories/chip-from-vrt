@@ -1,6 +1,6 @@
 {
     "name": "chip-from-vrt",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "description": "A GBDX task for generating AOI chips from a group of images on S3 using the GDAL virtual format. The images can be individual strips or the tiles of a FLAME mosaic.",
     "properties": {
         "isPublic": true,
@@ -77,7 +77,13 @@
         {
           "name": "jpg",
           "type": "string",
-          "description": "If True, will JPEG compress output chips. Defaults to False.",
+          "description": "If True, will save chips as JPEGs. Defaults to False.",
+          "required": false
+        },
+        {
+          "name": "reproject_to",
+          "type": "string",
+          "description": "If True, will reproject chips to the specified projection (ex EPSG:4326). Defaults to no reprojecting (None).",
           "required": false
         }
     ],

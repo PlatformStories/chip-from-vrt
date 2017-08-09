@@ -59,6 +59,33 @@ def mask_chip(feature):
     os.remove(fn)
 
 
+def reproject_chip(feature, proj, jpg):
+    '''
+    Replaces chip with reprojected version of itself
+    '''
+    if jpg:
+        ext = '.jpg'
+    else:
+        ext = '.tif'
+
+    # Warp chip
+    chip_name = str(feature['properties']['feature_id'])
+    cmd = 'gdalwarp -t_srs {} {}{} w_{}.tif'.format(proj, chip_name, ext, chip_name)
+    subprocess.call(cmd, shell=True)
+
+    # Translate chip to JPEG
+    if jpg:
+        cmd = 'gdal_translate -of JPEG -scale w_{}.tif {}.jpg'.format(chip_name, chip_name)
+        subprocess.call(cmd, shell=True)
+        os.remove('w_{}.tif')
+
+    # Replace original chip with warped version
+    else:
+        os.rename('w_{}.tif'.format(chip_name), chip_name + '.tif')
+
+
+
+
 class ChipFromVrt(GbdxTaskInterface):
     '''
     Extract features in a geojson from imagery
@@ -71,6 +98,7 @@ class ChipFromVrt(GbdxTaskInterface):
         GbdxTaskInterface.__init__(self)
         self.execute_command = execute_command
         self.mask_chip = mask_chip
+        self.reproject_chip = reproject_chip
 
         self.geojson_dir = self.get_input_data_port('geojson')
         self.geojsons = [f for f in os.listdir(self.geojson_dir) if f.endswith('.geojson')]
@@ -88,6 +116,7 @@ class ChipFromVrt(GbdxTaskInterface):
         self.bit_depth = ast.literal_eval(self.get_input_string_port('bit_depth', default='None'))
         self.shapefile = self.get_input_string_port('shapefile_location', default = 'wms/vsitindex_z12.shp')
         self.bands = self.get_input_string_port('bands', default=None)
+        self.reproject_to = self.get_input_string_port('reproject_to', default=None)
 
         # Assert exactly one geojson file passed
         if len(self.geojsons) != 1:
@@ -194,7 +223,10 @@ class ChipFromVrt(GbdxTaskInterface):
             ulx, lrx, uly, lry = min(xs), max(xs), max(ys), min(ys)
 
             # format gdal_translate command
-            out_loc = os.path.join(self.out_dir, str(f_id) + '.tif')
+            if self.jpg:
+                out_loc = os.path.join(self.out_dir, str(f_id) + '.jpg')
+            else:
+                out_loc = os.path.join(self.out_dir, str(f_id) + '.tif')
 
             pref = 'env GDAL_DISABLE_READDIR_ON_OPEN=YES VSI_CACHE=TRUE CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif .vrt" gdal_translate -eco -q -co TILED=YES'
             projwin = ' -projwin {0} {1} {2} {3} {4} {5} --config GDAL_TIFF_INTERNAL_MASK YES'.format(str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
@@ -207,7 +239,7 @@ class ChipFromVrt(GbdxTaskInterface):
                     pref += ' -b ' + str(band)
 
             if self.jpg:
-                pref += ' -co COMPRESS=JPEG -co PHOTOMETRIC=YCBCR'
+                pref += ' -of JPEG -scale'
 
             cmd = pref + projwin
             print cmd
@@ -275,7 +307,6 @@ class ChipFromVrt(GbdxTaskInterface):
 
         ##### Create VRT as a pointer to imagery on S3
         vrt_file = self.create_vrt()
-        # vrt_file = 'mosaic.vrt'
 
         ##### Generate feature ids if not provided
         if 'feature_id' not in  feature_collection[0]['properties'].keys():
@@ -302,8 +333,18 @@ class ChipFromVrt(GbdxTaskInterface):
             p.close()
             p.join()
 
-        ##### Remove msk files
+        ##### Reproject chips in parallel
+        if self.reproject_to:
+            reproj = partial(self.reproject_to, proj=self.reproject_to, jpg=self.jpg)
+            p = Pool(cpu_count())
+            p.map(reproj, feature_collection)
+            p.close()
+            p.join()
+
+        ##### Clean up
         for fl in glob('*.msk'):
+            os.remove(fl)
+        for fl in glob('*.xml'):
             os.remove(fl)
 
         ##### Create output geojson for feature_id reference
