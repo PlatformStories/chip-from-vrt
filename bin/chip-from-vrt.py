@@ -36,12 +36,17 @@ def execute_command(cmd):
         return True
 
 
-def mask_chip(feature):
+def mask_chip(feature, jpg):
     '''
     Apply polygon mask to bounding-box chips. Chips must be named
         'feature_id.tif' and exist in the current working directory.
     '''
-    chip_name = str(feature['properties']['feature_id']) + '.tif'
+    if jpg:
+        ext = '.jpg'
+    else:
+        ext = '.tif'
+
+    chip_name = str(feature['properties']['feature_id']) + ext
     fn = str(feature['properties']['feature_id']) + '.geojson'
     chip = gdal.Open(chip_name)
 
@@ -71,13 +76,14 @@ def reproject_chip(feature, proj, jpg):
     # Warp chip
     chip_name = str(feature['properties']['feature_id'])
     cmd = 'gdalwarp -t_srs {} {}{} w_{}.tif'.format(proj, chip_name, ext, chip_name)
+    print cmd
     subprocess.call(cmd, shell=True)
 
     # Translate chip to JPEG
     if jpg:
         cmd = 'gdal_translate -of JPEG -scale w_{}.tif {}.jpg'.format(chip_name, chip_name)
         subprocess.call(cmd, shell=True)
-        os.remove('w_{}.tif')
+        os.remove('w_{}.tif'.format(chip_name))
 
     # Replace original chip with warped version
     else:
@@ -140,6 +146,11 @@ class ChipFromVrt(GbdxTaskInterface):
         # Format bands
         if self.bands:
             self.bands = [int(band.strip()) for band in self.bands.split(',')]
+
+        if self.jpg:
+            self.ext = '.jpg'
+        else:
+            self.ext = '.tif'
 
         # Format imagery input (list for non-mosaic, string for mosaic)
         # TODO make this a multiplex input port if possible
@@ -228,7 +239,7 @@ class ChipFromVrt(GbdxTaskInterface):
             else:
                 out_loc = os.path.join(self.out_dir, str(f_id) + '.tif')
 
-            pref = 'env GDAL_DISABLE_READDIR_ON_OPEN=YES VSI_CACHE=TRUE CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif .vrt" gdal_translate -eco -q -co TILED=YES'
+            pref = 'env GDAL_DISABLE_READDIR_ON_OPEN=YES VSI_CACHE=TRUE CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif .vrt" gdal_translate -eco -q'
             projwin = ' -projwin {0} {1} {2} {3} {4} {5} --config GDAL_TIFF_INTERNAL_MASK YES'.format(str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
 
             if self.bit_depth:
@@ -255,7 +266,7 @@ class ChipFromVrt(GbdxTaskInterface):
         create a geojson with only features in chips output directory.
         '''
         # Get list of feature_ids in output directory
-        chips = [f[:-4] for f in os.listdir('.') if f.endswith('.tif')]
+        chips = [f[:-4] for f in os.listdir('.') if f.endswith(self.ext)]
         feature_collection = open_geoj['features']
         valid_feats = []
 
@@ -277,7 +288,7 @@ class ChipFromVrt(GbdxTaskInterface):
         '''
 
         # All ids of chipped features
-        feats_in_output = [chip[:-4] for chip in os.listdir(self.out_dir) if chip.endswith('.tif')]
+        feats_in_output = [chip[:-4] for chip in os.listdir(self.out_dir) if chip.endswith(self.ext)]
         missed_feats = []
 
         # Detemine features that were missed
@@ -328,14 +339,15 @@ class ChipFromVrt(GbdxTaskInterface):
         ##### Mask chips in parallel
         os.chdir(self.out_dir) # !!!! Now in output directory !!!!
         if self.mask:
+            mask_chip = partial(self.mask_chip, jpg=self.jpg)
             p = Pool(cpu_count())
-            p.map(self.mask_chip, feature_collection)
+            p.map(mask_chip, feature_collection)
             p.close()
             p.join()
 
         ##### Reproject chips in parallel
         if self.reproject_to:
-            reproj = partial(self.reproject_to, proj=self.reproject_to, jpg=self.jpg)
+            reproj = partial(self.reproject_chip, proj=self.reproject_to, jpg=self.jpg)
             p = Pool(cpu_count())
             p.map(reproj, feature_collection)
             p.close()
@@ -358,7 +370,7 @@ class ChipFromVrt(GbdxTaskInterface):
             shutil.move('chips.tar', 'chips/chips.tar')
             os.chdir('chips/')
 
-            for fl in glob('*.tif') + glob('*.geojson'):
+            for fl in glob('*' + self.ext) + glob('*.geojson'):
                 os.remove(fl)
 
 
