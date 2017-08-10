@@ -119,7 +119,7 @@ class ChipFromVrt(GbdxTaskInterface):
         self.token = self.get_input_string_port('aws_session_token', default=None)
         self.tar = ast.literal_eval(self.get_input_string_port('tar', default='False'))
         self.jpg = ast.literal_eval(self.get_input_string_port('jpg', default='False'))
-        self.jpg = ast.literal_eval(self.get_input_string_port('filter_black', default='False'))
+        self.filter_black = ast.literal_eval(self.get_input_string_port('filter_black', default='False'))
         self.bit_depth = ast.literal_eval(self.get_input_string_port('bit_depth', default='None'))
         self.shapefile = self.get_input_string_port('shapefile_location', default = 'wms/vsitindex_z12.shp')
         self.bands = self.get_input_string_port('bands', default=None)
