@@ -119,6 +119,7 @@ class ChipFromVrt(GbdxTaskInterface):
         self.token = self.get_input_string_port('aws_session_token', default=None)
         self.tar = ast.literal_eval(self.get_input_string_port('tar', default='False'))
         self.jpg = ast.literal_eval(self.get_input_string_port('jpg', default='False'))
+        self.jpg = ast.literal_eval(self.get_input_string_port('filter_black', default='False'))
         self.bit_depth = ast.literal_eval(self.get_input_string_port('bit_depth', default='None'))
         self.shapefile = self.get_input_string_port('shapefile_location', default = 'wms/vsitindex_z12.shp')
         self.bands = self.get_input_string_port('bands', default=None)
@@ -358,6 +359,13 @@ class ChipFromVrt(GbdxTaskInterface):
             os.remove(fl)
         for fl in glob('*.xml'):
             os.remove(fl)
+
+        if self.filter_black:
+            print 'Removing black chips'
+            for fl in glob('*' + self.ext):
+                unique = np.unique(gdal.Open(fl).ReadAsArray())
+                if len(unique) == 1 and unique[0] == 0:
+                    os.remove(fl)
 
         ##### Create output geojson for feature_id reference
         self.get_ref_geojson(data)
