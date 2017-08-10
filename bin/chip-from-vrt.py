@@ -37,19 +37,13 @@ def execute_command(cmd):
         return True
 
 
-def mask_chip(feature, jpg):
+def mask_chip(feature):
     '''
     Apply polygon mask to bounding-box chips. Chips must be named
         'feature_id.tif' and exist in the current working directory.
     '''
-    if jpg:
-        ext = '.jpg'
-    else:
-        ext = '.tif'
-
-    chip_name = str(feature['properties']['feature_id']) + ext
-    fn = str(feature['properties']['feature_id']) + '.geojson'
-    chip = gdal.Open(chip_name)
+    fn = feature[:-4] + '.geojson'
+    chip = gdal.Open(feature)
 
     # Create ogr vector file for gdal_rasterize
     vectordata = {'type': 'FeatureCollection', 'features': [feature]}
@@ -58,7 +52,7 @@ def mask_chip(feature, jpg):
         geojson.dump(vectordata, f)
 
     # Mask raster
-    cmd = 'gdal_rasterize -q -i -b 1 -b 2 -b 3 -burn 0 -burn 0 -burn 0 {} {}'.format(fn, chip_name)
+    cmd = 'gdal_rasterize -q -i -b 1 -b 2 -b 3 -burn 0 -burn 0 -burn 0 {} {}'.format(fn, feature)
     subprocess.call(cmd, shell=True)
 
     # Remove ogr vector file
@@ -69,30 +63,24 @@ def reproject_chip(feature, proj, jpg):
     '''
     Replaces chip with reprojected version of itself
     '''
-    if jpg:
-        ext = '.jpg'
-    else:
-        ext = '.tif'
+    print 'Reprojecting...'
 
     # Warp chip
-    chip_name = str(feature['properties']['feature_id'])
-    cmd = 'gdalwarp -t_srs {} {}{} w_{}.tif'.format(proj, chip_name, ext, chip_name)
+    cmd = 'gdalwarp -t_srs {} {} w_{}.tif'.format(proj, feature, feature[:-4])
     print cmd
     subprocess.call(cmd, shell=True)
 
     # Translate chip to JPEG
     if jpg:
-        try:
-            cmd = 'gdal_translate -of JPEG -scale w_{}.tif {}.jpg'.format(chip_name, chip_name)
-            subprocess.call(cmd, shell=True)
-            os.remove('w_{}.tif'.format(chip_name))
-        except:
-            pass
+        cmd = 'gdal_translate -of JPEG w_{}.tif {}'.format(feature[:-4], feature)
+        subprocess.call(cmd, shell=True)
+        os.remove('w_{}.tif'.format(feature[:-4]))
+
 
     # Replace original chip with warped version
     else:
         try:
-            os.rename('w_{}.tif'.format(chip_name), chip_name + '.tif')
+            os.rename('w_{}.tif'.format(feature[:-4]), feature[:-4] + '.tif')
         except:
             pass
 
@@ -130,6 +118,8 @@ class ChipFromVrt(GbdxTaskInterface):
         self.shapefile = self.get_input_string_port('shapefile_location', default = 'wms/vsitindex_z12.shp')
         self.bands = self.get_input_string_port('bands', default=None)
         self.reproject_to = self.get_input_string_port('reproject_to', default=None)
+        if self.reproject_to:
+            print 'Reprojecting to: ' + str(self.reproject_to)
 
         # Assert exactly one geojson file passed
         if len(self.geojsons) != 1:
@@ -246,7 +236,7 @@ class ChipFromVrt(GbdxTaskInterface):
             else:
                 out_loc = os.path.join(self.out_dir, str(f_id) + '.tif')
 
-            pref = 'env GDAL_DISABLE_READDIR_ON_OPEN=YES VSI_CACHE=TRUE CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif .vrt" gdal_translate -eco -q'
+            pref = 'env GDAL_DISABLE_READDIR_ON_OPEN=YES VSI_CACHE=TRUE CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif .vrt .jpg .xml" gdal_translate -eco -q'
             projwin = ' -projwin {0} {1} {2} {3} {4} {5} --config GDAL_TIFF_INTERNAL_MASK YES'.format(str(ulx), str(uly), str(lrx), str(lry), vrt_file, out_loc)
 
             if self.bit_depth:
@@ -257,7 +247,7 @@ class ChipFromVrt(GbdxTaskInterface):
                     pref += ' -b ' + str(band)
 
             if self.jpg:
-                pref += ' -of JPEG -scale'
+                pref += ' -of JPEG'
 
             cmd = pref + projwin
             print cmd
@@ -345,10 +335,10 @@ class ChipFromVrt(GbdxTaskInterface):
 
         ##### Mask chips in parallel
         os.chdir(self.out_dir) # !!!! Now in output directory !!!!
+        features = glob('*' + self.ext)
         if self.mask:
-            mask_chip = partial(self.mask_chip, jpg=self.jpg)
             p = Pool(cpu_count())
-            p.map(mask_chip, feature_collection)
+            p.map(self.mask_chip, features)
             p.close()
             p.join()
 
@@ -356,7 +346,7 @@ class ChipFromVrt(GbdxTaskInterface):
         if self.reproject_to:
             reproj = partial(self.reproject_chip, proj=self.reproject_to, jpg=self.jpg)
             p = Pool(cpu_count())
-            p.map(reproj, feature_collection)
+            p.map(reproj, features)
             p.close()
             p.join()
 
@@ -371,10 +361,7 @@ class ChipFromVrt(GbdxTaskInterface):
             for fl in glob('*' + self.ext):
                 unique = np.unique(gdal.Open(fl).ReadAsArray())
                 if len(unique) == 1 and unique[0] == 0:
-                    try:
-                        os.remove(fl)
-                    except FileNotFoundError:
-                        pass
+                    os.remove(fl)
 
         ##### Create output geojson for feature_id reference
         self.get_ref_geojson(data)
