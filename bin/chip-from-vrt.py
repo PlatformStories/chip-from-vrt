@@ -12,6 +12,7 @@ import logging
 import geojson, json
 import subprocess
 import os, ast, re, shutil
+import numpy as np
 
 from glob import glob
 from functools import partial
