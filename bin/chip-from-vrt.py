@@ -82,14 +82,19 @@ def reproject_chip(feature, proj, jpg):
 
     # Translate chip to JPEG
     if jpg:
-        cmd = 'gdal_translate -of JPEG -scale w_{}.tif {}.jpg'.format(chip_name, chip_name)
-        subprocess.call(cmd, shell=True)
-        os.remove('w_{}.tif'.format(chip_name))
+        try:
+            cmd = 'gdal_translate -of JPEG -scale w_{}.tif {}.jpg'.format(chip_name, chip_name)
+            subprocess.call(cmd, shell=True)
+            os.remove('w_{}.tif'.format(chip_name))
+        except:
+            pass
 
     # Replace original chip with warped version
     else:
-        os.rename('w_{}.tif'.format(chip_name), chip_name + '.tif')
-
+        try:
+            os.rename('w_{}.tif'.format(chip_name), chip_name + '.tif')
+        except:
+            pass
 
 
 
@@ -366,7 +371,10 @@ class ChipFromVrt(GbdxTaskInterface):
             for fl in glob('*' + self.ext):
                 unique = np.unique(gdal.Open(fl).ReadAsArray())
                 if len(unique) == 1 and unique[0] == 0:
-                    os.remove(fl)
+                    try:
+                        os.remove(fl)
+                    except FileNotFoundError:
+                        pass
 
         ##### Create output geojson for feature_id reference
         self.get_ref_geojson(data)
