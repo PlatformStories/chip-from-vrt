@@ -1,6 +1,7 @@
 {
     "name": "chip-from-vrt",
     "version": "0.2.11",
+    "taskOwnerEmail": "kostas.stamatiou@digitalglobe.com",
     "description": "A GBDX task for generating AOI chips from a group of images on S3 using the GDAL virtual format. The images can be individual strips or the tiles of a FLAME mosaic.",
     "properties": {
         "isPublic": true,
